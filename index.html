@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Viewer</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center; /* Center items horizontally */
+        align-items: center; /* Center items vertically */
+        padding: 20px;
+    }
+    .pdf-button {
+        margin: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .pdf-button:hover {
+        background-color: #0056b3;
+    }
+    .pdf-box {
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        height: 100vh; /* Set full height for the PDF viewer container */
+    }
+    #pdf-container {
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+    }
+    canvas {
+        display: block;
+        margin: auto;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <button class="pdf-button" data-url="Syllogism.pdf">Syllogism Concepts</button>
+    <button class="pdf-button" data-url="Permutation & Combination.pdf">Permutation & Combination Concepts</button>
+    <button class="pdf-button" data-url="Mensuration concept.pdf">Mensuration Concepts</button>
+    <button class="pdf-button" data-url="Image Puzzle.pdf">Image Puzzle</button>
+    <button class="pdf-button" data-url="Geometry concept.pdf">Geometry Concepts</button>
+</div>
+
+<div id="pdf-container" class="pdf-box"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+<script>
+    var pdfContainer = document.getElementById('pdf-container');
+    var pdfButtons = document.querySelectorAll('.pdf-button');
+
+    // Function to load and display PDFs
+    function displayPDF(pdfUrl) {
+        pdfContainer.innerHTML = ''; // Clear previous content
+
+        // Load PDF
+        pdfjsLib.getDocument(pdfUrl).promise.then(function(pdfDoc) {
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                pdfDoc.getPage(i).then(function(page) {
+                    var div = document.createElement('div');
+                    div.classList.add('pdf-page');
+
+                    var canvas = document.createElement('canvas');
+                    div.appendChild(canvas);
+                    pdfContainer.appendChild(div);
+
+                    var viewport = page.getViewport({ scale: 1.5 });
+                    var context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    var renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+                });
+            }
+        }).catch(function(error) {
+            console.error('Error loading PDF:', error);
+        });
+    }
+
+    // Event listener for button clicks
+    pdfButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var pdfUrl = button.getAttribute('data-url');
+            displayPDF(pdfUrl);
+        });
+    });
+</script>
+
+</body>
+</html>
